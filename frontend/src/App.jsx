@@ -90,32 +90,57 @@ const App = () => {
     }
   };
 
+  const [normalResponse, setNormalResponse] = useState(null);
+
   const sendData = async () => {
     try {
-      const requestData = { data: "Some Sensitive Data", id:1234 };
+      const requestData = { data: "Some Sensitive Data", id: 1234 };
       const response = await api.post("/test", requestData);
+      setNormalResponse(response.data)
       console.log(response.data);
-      
+
+
     } catch (error) {
       console.error("Error sending encrypted data:", error);
     }
   };
 
   return (
+    <>
     <div className="container">
-      <h1>Secure Communication Demo</h1>
+      <h1>SafeXchange</h1>
       <p className="description">
         This demo showcases secure communication between a client and a server using AES and RSA encryption.
       </p>
-
+      <p className="description">
+         <h4>Old version: <a href="https://www.npmjs.com/package/safexchange">https://www.npmjs.com/package/safexchange</a> </h4>
+      </p>
+      <div className="info-section">
+        <h2>Why Secure Communication Matters?</h2>
+        <p>
+          Many startups and companies often do not implement proper server-side validations, leading to potential security loopholes. 
+          In some cases, sensitive and non-disclosable data might be exposed due to poor encryption or lack of end-to-end security.
+        </p>
+        <p>
+          This is where solutions like <strong>SafeXchange</strong> come into play. By implementing robust client-side and server-side 
+          encryption using AES and RSA, sensitive information remains protected even if other security measures fail.
+        </p>
+        <p>
+          Always ensure that your applications handle data securely, whether it's user credentials, financial data, or any other sensitive 
+          information. Encryption should be a fundamental part of your development process.
+        </p>
+        </div>
+        <br/>
+        <h2>Updated version with secure workflow:</h2>
       <div className="step">
-        <h2>Step 1: Send Normal Data</h2>
+        <h2>Step 0: Send Normal Data</h2>
         <p>
           Send Data Normally
         </p>
         <button onClick={sendData} >
           Send Normal Message
         </button>
+        {normalResponse && <p>Response: {JSON.stringify(normalResponse, null, 2)}</p>}
       </div>
       <div className="step">
         <h2>Step 1: Fetch Server's Public Key</h2>
@@ -156,7 +181,8 @@ const App = () => {
           <pre>{decryptedData}</pre>
         </div>
       )}
-    </div>
+      </div>
+      </>
   );
 };
 

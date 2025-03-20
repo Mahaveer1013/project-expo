@@ -138,7 +138,7 @@ app.use((req, res, next) => {
 // Test route
 app.post('/test', (req, res) => {
     console.log(req.body);
-    res.json({ message: "Received Secure Data" });
+    res.json({ data: "Some secure data been sent by mistake" });
 });
 
 const port = process.env.PORT || 3000;
