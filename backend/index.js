@@ -16,6 +16,12 @@ app.use(cors({
     exposedHeaders: ["x-data-encrypted"]
 }));
 
+// Test route
+app.get('/', (req, res) => {
+    res.json({ message: "Connection successful" });
+});
+
+
 const keyStorage = {}; // Store session keys
 
 const logTemp = () => {
@@ -134,7 +140,6 @@ app.post('/test', (req, res) => {
     console.log(req.body);
     res.json({ message: "Received Secure Data" });
 });
-
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
