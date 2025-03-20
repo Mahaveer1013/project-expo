@@ -25,23 +25,24 @@ function generateAESKey(keyLength = 32) {
 }
 
 // Encrypt data with AES key
-function encryptWithAES(key, data) {
-  console.log('Before Encrypting response: ', data);
+function encryptWithAES(key, body) {
+  console.log('\n\nBefore Encrypting response: \n', body);
+  data = JSON.stringify(body)
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key, 'hex'), iv);
   let encrypted = cipher.update(data, 'utf8', 'hex');
   encrypted += cipher.final('hex');
-  console.log('After Encrypting response: ', { iv: iv.toString('hex'), encryptedData: encrypted });
+  console.log('\n\nAfter Encrypting response: \n', { iv: iv.toString('hex'), encryptedData: encrypted });
   return { iv: iv.toString('hex'), encryptedData: encrypted };
 }
 
 // Decrypt data with AES key
 function decryptWithAES(key, iv, encryptedData) {
-  console.log('Before Decrypting Request: ', encryptedData);
+  console.log('\n\nBefore Decrypting Request: \n', { iv, encryptedData });
   const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key, 'hex'), Buffer.from(iv, 'hex'));
   let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
-  console.log('After Decrypting Request: ', decrypted);
+  console.log('\n\nAfter Decrypting Request: \n');
   return decrypted;
 }
 

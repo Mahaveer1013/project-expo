@@ -3,12 +3,14 @@ const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const { generateKeyPair, decryptWithPrivateKey, decryptWithAES, encryptWithAES } = require('./utils');
 const cors = require('cors');
+const dotenv = require('dotenv');
+dotenv.config()
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     credentials: true,
     allowedHeaders: ['Content-Type', "Access-Control-Allow-Origin", "x-data-encrypted"],
     exposedHeaders: ["x-data-encrypted"]
@@ -27,12 +29,6 @@ const logTemp = () => {
     console.log('keyStorage: ', temp);
 }
 
-// const removeOldSession = (sessionId) => {
-//     if (!sessionId) return;
-//     else if (!keyStorage[sessionId]) return;
-//     delete keyStorage[sessionId];
-// }
-
 // Get server's public key
 app.get('/get_public_key', (req, res) => {
     const keys = generateKeyPair();
@@ -47,7 +43,7 @@ app.get('/get_public_key', (req, res) => {
     console.log("client requested for public key : " + keys.publicKey.slice(0, 10) + '...');
     console.log("also a session id is stored in its cookies for identification : " + sessionId.slice(0, 10) + '...');
 
-    // logTemp()
+    logTemp()
 
     const oldSessionId = req.cookies.sessionId;
 
@@ -68,11 +64,9 @@ app.get('/get_public_key', (req, res) => {
 
 // Set AES session key
 app.post('/set_session', (req, res) => {
-    console.log(keyStorage);
-
     const { encryptedAESKey } = req.body;
     const sessionId = req.cookies.sessionId;
-    console.log(sessionId, keyStorage[sessionId]);
+    // console.log(sessionId, keyStorage[sessionId]);
 
     if (!sessionId || !keyStorage[sessionId]) {
         return res.status(401).json({ error: 'Invalid session ID' });
@@ -80,11 +74,9 @@ app.post('/set_session', (req, res) => {
 
     const keyData = keyStorage[sessionId];
     const aesKey = decryptWithPrivateKey(keyData.privateKey, encryptedAESKey);
-    console.log('AES Key:', aesKey);
-
     keyStorage[sessionId].secretKey = aesKey;
-
-    // logTemp()
+  
+    logTemp();
 
     res.json({ success: true });
 });
@@ -120,7 +112,7 @@ app.use((req, res, next) => {
         const keyData = keyStorage[sessionId];
 
         if (typeof body === 'string' && keyData && keyData.secretKey) {
-            const { iv, encryptedData } = encryptWithAES(keyData.secretKey, JSON.stringify(body));
+            const { iv, encryptedData } = encryptWithAES(keyData.secretKey, body);
 
             // Indicate that the response is encrypted
             res.setHeader('x-data-encrypted', 'true');
@@ -139,8 +131,10 @@ app.use((req, res, next) => {
 
 // Test route
 app.post('/test', (req, res) => {
+    console.log(req.body);
     res.json({ message: "Received Secure Data" });
 });
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));

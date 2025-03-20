@@ -2,7 +2,7 @@ import CryptoJS from "crypto-js";
 
 // Encrypt data using AES-CBC
 export const encryptWithAES = (key, data) => {
-  console.log("before encrypting request: ", data);
+  console.log("\n\nBefore encrypting request: \n", data);
   
   const iv = CryptoJS.lib.WordArray.random(16);
   const encrypted = CryptoJS.AES.encrypt(data, CryptoJS.enc.Hex.parse(key), {
@@ -11,7 +11,7 @@ export const encryptWithAES = (key, data) => {
     padding: CryptoJS.pad.Pkcs7,
   });
 
-  console.log("after encrypting request: ", {
+  console.log("\n\nAfter encrypting request: \n", {
     iv: iv.toString(CryptoJS.enc.Hex),
     encryptedData: encrypted.ciphertext.toString(CryptoJS.enc.Hex), // Hex format
   });
@@ -27,7 +27,7 @@ export const encryptWithAES = (key, data) => {
 // Decrypt data using AES-CBC
 export const decryptWithAES = (key, iv, encryptedData) => {
 
-  console.log("Before Decryption:", encryptedData);
+  console.log("\n\nBefore Decrypting Response:\n", {iv, encryptedData});
 
   const decrypted = CryptoJS.AES.decrypt(
     { ciphertext: CryptoJS.enc.Hex.parse(encryptedData) }, // Convert back from Hex
@@ -38,7 +38,7 @@ export const decryptWithAES = (key, iv, encryptedData) => {
       padding: CryptoJS.pad.Pkcs7,
     }
   ).toString(CryptoJS.enc.Utf8);
-  console.log("Decrypted:", JSON.parse(decrypted));
+  console.log("\n\nAfter Decrypting Response:\n", JSON.parse(decrypted));
   
   try {
     return JSON.parse(decrypted); // ✅ Parse JSON before returning

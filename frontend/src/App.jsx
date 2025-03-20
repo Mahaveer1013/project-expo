@@ -3,7 +3,7 @@ import './index.css'
 import axios from "axios";
 import { decryptWithAES, encryptWithAES, encryptWithPublicKey } from "./utils";
 
-const url = "http://localhost:3000"
+const url = import.meta.env.VITE_API_URL
 
 const api = axios.create({
   baseURL: url,
@@ -32,17 +32,13 @@ const App = () => {
   const [aesKey, setAesKey] = useState(null);
   const [decryptedData, setDecryptedData] = useState(null);
 
-  // useEffect(() => {
-  //   fetchPublicKey();
-  // }, []);
-
   const fetchPublicKey = async () => {
     try {
       const response = await api.get("/get_public_key");
-      
+
       if (response.data.publicKey)
-        console.log("received public key \n", response.data.publicKey.slice(0,20));
-        setPublicKey(response.data.publicKey);
+        console.log("received public key \n", response.data.publicKey.slice(0, 20));
+      setPublicKey(response.data.publicKey);
     } catch (error) {
       console.error("Error fetching public key:", error);
     }
@@ -94,6 +90,17 @@ const App = () => {
     }
   };
 
+  const sendData = async () => {
+    try {
+      const requestData = { data: "Some Sensitive Data", id:1234 };
+      const response = await api.post("/test", requestData);
+      console.log(response.data);
+      
+    } catch (error) {
+      console.error("Error sending encrypted data:", error);
+    }
+  };
+
   return (
     <div className="container">
       <h1>Secure Communication Demo</h1>
@@ -101,6 +108,15 @@ const App = () => {
         This demo showcases secure communication between a client and a server using AES and RSA encryption.
       </p>
 
+      <div className="step">
+        <h2>Step 1: Send Normal Data</h2>
+        <p>
+          Send Data Normally
+        </p>
+        <button onClick={sendData} >
+          Send Normal Message
+        </button>
+      </div>
       <div className="step">
         <h2>Step 1: Fetch Server's Public Key</h2>
         <p>
@@ -120,7 +136,7 @@ const App = () => {
         <button onClick={setSessionKey} disabled={!publicKey || aesKey}>
           {aesKey ? "AES Key Set" : "Set AES Key"}
         </button>
-          {aesKey && <p>AES Key: {aesKey}</p>}
+        {aesKey && <p>AES Key: {aesKey}</p>}
       </div>
 
       <div className="step">
